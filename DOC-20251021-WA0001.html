@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSIS - Organisasi Siswa Intra Sekolah</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* --- CSS STYLES --- */
+        :root {
+            --primary-color: #004d99; /* Biru tua, lebih profesional */
+            --secondary-color: #ffffff; /* Putih */
+            --text-color: #212529; /* Hitam/Abu gelap */
+            --header-bg: #007bff; /* Biru terang untuk background */
+            --accent-color: #ffc107; /* Kuning (untuk highlight/animasi) */
+            --hover-bg: #f0f8ff; /* Sangat ringan untuk hover */
+            --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-heavy: 0 8px 25px rgba(0, 0, 0, 0.25);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: var(--text-color);
+            transition: background-color 0.5s;
+        }
+        
+        /* SCROLLBAR CUSTOMIZATION (Aesthetic) */
+        body::-webkit-scrollbar { width: 8px; }
+        body::-webkit-scrollbar-track { background: var(--secondary-color); }
+        body::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 4px; }
+        body::-webkit-scrollbar-thumb:hover { background: var(--header-bg); }
+
+        /* HEADER & LOGO */
+        header {
+            background-color: var(--header-bg);
+            color: var(--secondary-color);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-heavy);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-placeholder {
+            font-size: 2em;
+            color: var(--accent-color);
+            padding: 5px;
+            border-radius: 50%;
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .logo-placeholder:hover {
+            transform: rotate(10deg) scale(1.1);
+        }
+
+        h1 {
+            flex-grow: 1;
+            text-align: center;
+            margin: 0;
+            font-size: 2.5em;
+            letter-spacing: 1.5px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        /* NAVIGATION */
+        .navbar {
+            display: flex;
+            justify-content: center;
+            background-color: var(--primary-color);
+        }
+
+        .nav-button {
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            padding: 18px 20px;
+            font-size: 1.05em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.4s ease-in-out, transform 0.2s, color 0.4s;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            flex-grow: 1;
+            max-width: 25%;
+            position: relative;
+            opacity: 0.9;
+        }
+
+        .nav-button i {
+            margin-right: 8px;
+        }
+
+        .nav-button:hover {
+            background-color: #003366; /* Biru lebih gelap */
+            opacity: 1;
+        }
+
+        .nav-button.active {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            font-weight: bold;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+            opacity: 1;
+        }
+        
+        /* ANIMASI BAR AKTIF */
+        .nav-button.active::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: var(--accent-color);
+            animation: slideIn 0.5s forwards;
+        }
+
+        @keyframes slideIn {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        /* CONTENT SECTIONS */
+        .content-section {
+            padding: 50px 5%;
+            max-width: 1300px;
+            margin: 0 auto;
+            display: none; 
+            min-height: 70vh;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 4px solid var(--accent-color);
+            padding-bottom: 15px;
+            margin-bottom: 40px;
+            text-align: center;
+            font-size: 2.6em;
+            text-transform: uppercase;
+        }
+
+        /* STRUCTURE & DEPARTMENTS STYLES (Cards) */
+        .structure-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .structure-card {
+            background-color: var(--secondary-color);
+            border-radius: 15px;
+            padding: 30px 20px;
+            box-shadow: var(--shadow-light);
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s, background-color 0.3s;
+        }
+
+        /* ANIMASI CARD HOVER */
+        .structure-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(0, 123, 255, 0.1));
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .structure-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: var(--shadow-heavy);
+            background-color: var(--hover-bg);
+        }
+        
+        .structure-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            font-size: 3.5em;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            transition: color 0.3s;
+        }
+        
+        .structure-card:hover .card-icon {
+            color: var(--accent-color);
+        }
+
+        /* DOKUMENTASI GALLERY GRID */
+        .documentation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Lebih kecil untuk 50 foto */
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .doc-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .doc-item img {
+            width: 100%;
+            height: 150px; 
+            object-fit: cover;
+            display: block;
+            transition: transform 0.6s ease, filter 0.6s;
+        }
+
+        .doc-item:hover img {
+            transform: scale(1.15); /* Animasi Zoom In yang memukau */
+            filter: brightness(0.8);
+        }
+        
+        /* KONTAK & LAYANAN STYLES */
+        .contact-grid {
+            display: flex;
+            justify-content: space-around;
+            gap: 30px;
+            padding: 40px;
+            background-color: var(--secondary-color);
+            border-radius: 15px;
+            box-shadow: var(--shadow-light);
+            margin-top: 40px;
+        }
+        
+        .contact-item {
+            text-align: center;
+            flex-basis: 30%;
+            padding: 20px;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        
+        .contact-item:hover {
+            background-color: var(--hover-bg);
+            border-color: var(--accent-color);
+        }
+        
+        .contact-item i {
+            font-size: 2em;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 30px;
+            background-color: var(--text-color);
+            color: var(--secondary-color);
+            margin-top: 50px;
+            font-size: 0.9em;
+            border-top: 5px solid var(--accent-color);
+        }
+
+        /* MEDIA QUERIES for Responsiveness */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 15px 10px;
+            }
+            .logo-container {
+                display: none; /* Sembunyikan logo di HP agar header lebih ringkas */
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            .navbar {
+                flex-direction: column;
+            }
+            .nav-button {
+                padding: 12px 15px;
+                max-width: 100%;
+            }
+            .content-section {
+                padding: 20px 5%;
+            }
+            .documentation-grid {
+                 grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            }
+            .contact-grid {
+                flex-direction: column;
+            }
+        }
+        /* Modal Styles (DIPERTAHANKAN) */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); animation: modalFadeIn 0.4s;}
+        .modal-content { background-color: var(--secondary-color); margin: 8% auto; padding: 40px; border: 5px solid var(--primary-color); width: 90%; max-width: 650px; border-radius: 20px; position: relative; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); animation: modalSlideDown 0.4s;}
+        @keyframes modalSlideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        #modalTitle { color: var(--primary-color); font-size: 1.8em; margin-bottom: 20px; border-bottom: 3px dashed var(--accent-color); padding-bottom: 10px;}
+        .member-list { list-style: none; padding: 0; text-align: left;}
+        .member-list li { padding: 10px 0; border-bottom: 1px solid #eee; font-size: 1.1em; transition: background-color 0.2s;}
+        .member-list li:hover { background-color: #f0f0f0; padding-left: 15px;}
+        .close-button { color: #aaa; float: right; font-size: 35px; font-weight: bold; transition: color 0.3s, transform 0.3s;}
+        .close-button:hover, .close-button:focus { color: var(--accent-color); text-decoration: none; cursor: pointer; transform: rotate(90deg);}
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <i class="fas fa-graduation-cap logo-placeholder" title="Logo Sekolah Kiri"></i>
+        </div>
+        
+        <h1>ORGANISASI SISWA INTRA SEKOLAH (OSIS)</h1>
+        
+        <div class="logo-container">
+            <i class="fas fa-certificate logo-placeholder" title="Logo OSIS Kanan"></i>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <button class="nav-button active" onclick="openTab('pengetahuan', this)">
+            <i class="fas fa-book"></i> Pengetahuan Umum
+        </button>
+        <button class="nav-button" onclick="openTab('struktur', this)">
+            <i class="fas fa-sitemap"></i> Struktur & Departemen
+        </button>
+        <button class="nav-button" onclick="openTab('dokumentasi', this)">
+            <i class="fas fa-camera"></i> Dokumentasi
+        </button>
+        <button class="nav-button" onclick="openTab('kontak', this)">
+            <i class="fas fa-headset"></i> Layanan & Kontak
+        </button>
+    </nav>
+
+    <section id="pengetahuan" class="content-section active">
+        <h2>Tentang OSIS & Program Kerja (Proker)</h2>
+
+        <p>
+            Organisasi Siswa Intra Sekolah (OSIS) adalah satu-satunya wadah organisasi siswa yang sah di sekolah. OSIS berfungsi sebagai sarana untuk mencapai tujuan pembinaan dan pengembangan kesiswaan. Tujuan utamanya adalah membina siswa-siswi menjadi manusia beriman dan bertaqwa, berakhlak mulia, cerdas, berdisiplin, serta bertanggung jawab.
+        </p>
+        
+        <h3>Program Kerja Utama Setiap Departemen</h3>
+        
+        <div class="structure-grid">
+            <div class="structure-card"><div class="card-icon"><i class="fas fa-user-friends"></i></div><div class="card-title">Kesiswaan</div><p>Mengelola database siswa, menegakkan tata tertib, dan mengurus administrasi upacara/apel rutin.</p></div>
+            <div class="structure-card"><div class="card-icon"><i class="fas fa-mosque"></i></div><div class="card-title">Keagamaan & Spiritual</div><p>Menyelenggarakan peringatan hari besar agama (PHBI), kajian/rohis mingguan, dan kegiatan bakti sosial keagamaan.</p></div>
+            <div class="structure-card"><div class="card-icon"><i class="fas fa-brain"></i></div><div class="card-title">Pembinaan Karakter</div><p>Mengadakan LDKS, *workshop* pengembangan diri, dan program peningkatan moral siswa.</p></div>
+            <div class="structure-card"><div class="card-icon"><i class="fas fa-futbol"></i></div><div class="card-title">Olahraga & Seni</div><p>Mengorganisir kompetisi olahraga internal (Class Meeting), menggelar Pentas Seni (Pensi), dan mengelola ekstrakurikuler seni/budaya.</p></div>
+            <div class="structure-card"><div class="card-icon"><i class="fas fa-handshake"></i></div><div class="card-title">Humas, Sosial Masyarakat & Komunikasi</div><p>Mengelola media informasi (website/medsos), menjalin kemitraan dengan organisasi luar, dan mengadakan bakti sosial/amal.</p></div>
+            <div class="structure-card"><div class="card-icon"><i class="fas fa-leaf"></i></div><div class="card-title">Lingkungan Hidup</div><p>Program Jum'at Bersih, penghijauan sekolah, kampanye mengurangi sampah plastik, dan pengelolaan bank sampah.</p></div>
+        </div>
+    </section>
+
+    <section id="struktur" class="content-section">
+        <h2>Struktur Kepengurusan OSIS Sementara</h2>
+        <p style="text-align: center; font-size: 1.2em; color: var(--primary-color);">**Klik pada setiap departemen untuk melihat daftar anggota secara detail melalui pop-up (Modal).**</p>
+        
+        <div class="structure-grid">
+            <div class="structure-card" onclick="openModal('inti')"><div class="card-icon"><i class="fas fa-crown"></i></div><div class="card-title">Inti OSIS</div><div class="card-subtitle">Ketua: Yamani</div></div>
+            <div class="structure-card" onclick="openModal('kesiswaan')"><div class="card-icon"><i class="fas fa-users"></i></div><div class="card-title">Departemen Kesiswaan</div><div class="card-subtitle">Ketua: Muhammad ikhsan</div></div>
+            <div class="structure-card" onclick="openModal('keagamaan')"><div class="card-icon"><i class="fas fa-quran"></i></div><div class="card-title">Departemen Keagamaan</div><div class="card-subtitle">Ketua: Nur Anisa</div></div>
+            <div class="structure-card" onclick="openModal('pembinaan_karakter')"><div class="card-icon"><i class="fas fa-lightbulb"></i></div><div class="card-title">Departemen Pembinaan Karakter</div><div class="card-subtitle">Ketua: Nor aina Azzahra</div></div>
+            <div class="structure-card" onclick="openModal('olahraga_seni')"><div class="card-icon"><i class="fas fa-medal"></i></div><div class="card-title">Departemen Olahraga dan Seni</div><div class="card-subtitle">Ketua: Fahrul</div></div>
+            <div class="structure-card" onclick="openModal('humas_sosial')"><div class="card-icon"><i class="fas fa-bullhorn"></i></div><div class="card-title">Departemen Humas Sosial Masyarakat dan Komunikasi</div><div class="card-subtitle">Ketua: Muhammad wafa</div></div>
+            <div class="structure-card" onclick="openModal('lingkungan')"><div class="card-icon"><i class="fas fa-tree"></i></div><div class="card-title">Departemen Lingkungan Hidup</div><div class="card-subtitle">Ketua: (Belum terdata)</div></div>
+            <div class="structure-card" onclick="openModal('sosial_kemasyarakatan')"><div class="card-icon"><i class="fas fa-hands-helping"></i></div><div class="card-title">Kegiatan Sosial dan Kemasyarakatan</div><div class="card-subtitle">Ketua: Akhmad risky</div></div>
+        </div>
+    </section>
+
+    <section id="dokumentasi" class="content-section">
+        <h2>Galeri Kegiatan OSIS (Siap untuk 50 Foto)</h2>
+        <p style="text-align: center; font-style: italic;">Ruang ini sudah dipersiapkan untuk menampung hingga 50 foto kegiatan OSIS Anda. Ganti file `placeholder-X.jpg` dengan gambar nyata.</p>
+
+        <div class="documentation-grid">
+            <script>
+                // Generate 50 placeholder image items
+                document.addEventListener('DOMContentLoaded', function() {
+                    const docGrid = document.querySelector('#dokumentasi .documentation-grid');
+                    if (docGrid) {
+                        for (let i = 1; i <= 50; i++) {
+                            const item = document.createElement('div');
+                            item.className = 'doc-item';
+                            item.innerHTML = `
+                                <img src="placeholder-${i % 6 + 1}.jpg" alt="Kegiatan OSIS #${i}"> 
+                                <div class="doc-caption">Kegiatan OSIS #${i}</div>
+                            `;
+                            docGrid.appendChild(item);
+                        }
+                    }
+                });
+            </script>
+        </div>
+    </section>
+    
+    <section id="kontak" class="content-section">
+        <h2>Layanan & Kontak</h2>
+        <p style="text-align: center; font-size: 1.2em;">Silakan hubungi kami untuk informasi lebih lanjut, pertanyaan, atau saran melalui layanan di bawah ini. Kami siap melayani!</p>
+        
+        <div class="contact-grid">
+            <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <h3>Email Resmi</h3>
+                <p>osis.sekolahanda@mail.com</p>
+                <a href="mailto:osis.sekolahanda@mail.com" style="color: var(--primary-color);">Kirim Email</a>
+            </div>
+            
+            <div class="contact-item">
+                <i class="fas fa-phone"></i>
+                <h3>Customer Service</h3>
+                <p>Nomor Kontak CS: 08xx-xxxx-xxxx</p>
+                <a href="tel:08xxxxxxxxxx" style="color: var(--primary-color);">Hubungi Sekarang</a>
+            </div>
+            
+            <div class="contact-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <h3>Alamat Sekretariat</h3>
+                <p>Ruang Sekretariat OSIS, Gedung B Lantai 1, Sekolah Anda.</p>
+                <a href="#" style="color: var(--primary-color);">Lihat Peta (Placeholder)</a>
+            </div>
+        </div>
+        
+        <h3 style="text-align: center; margin-top: 50px;">Formulir Kontak Cepat (Placeholder)</h3>
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-light);">
+            <p>*(Di sini Anda dapat menempatkan formulir kontak HTML/PHP di masa depan)*</p>
+        </div>
+    </section>
+
+    <div id="memberModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h3 id="modalTitle"></h3>
+            <ul id="modalMemberList" class="member-list">
+                </ul>
+        </div>
+    </div>
+
+    <footer>
+        <p>Organisasi Siswa Intra Sekolah (OSIS) | &copy; 2025</p>
+        <p>Desain Responsif, Rapi, dan Memukau | Dibuat dengan Semangat Kepemimpinan</p>
+    </footer>
+
+    <script>
+        /* --- JAVASCRIPT FOR INTERACTIVITY & DATA --- */
+
+        // Data Anggota OSIS dari file PDF
+        const osisData = {
+            inti: {
+                title: "Inti OSIS",
+                members: [
+                    "Ketua: Yamani",
+                    "Wakil Ketua 1 (Bidang kesiswaan, keagamaan dan spiritual): Muhammad Rafi'i",
+                    "Wakil Ketua 2 (Bidang pembinaan karakter, olahraga dan seni): Rusmawati",
+                    "Wakil Ketua 3 (Bidang humas, sosial masyarakat dan komunikasi): Annida",
+                    "Sekretaris 1: Misdah",
+                    "Sekretaris 2: Salamah",
+                    "Bendahara 1: Saniah",
+                    "Bendahara 2: Husnul Fatimah"
+                ]
+            },
+            kesiswaan: {
+                title: "Departemen Kesiswaan",
+                members: [
+                    "Ketua: Muhammad ikhsan",
+                    "Anggota 1: Jumaidi",
+                    "Anggota 2: Ridani",
+                    "Anggota 3: Risa saputri",
+                    "Anggota 4: Nurma",
+                    "Anggota 5: Noor Khatimah",
+                    "Anggota 6: Nabela",
+                    "Anggota 7: Halisah"
+                ]
+            },
+            keagamaan: {
+                title: "Departemen Keagamaan",
+                members: [
+                    "Ketua: Nur Anisa",
+                    "Anggota 1: Ahmad ilmi",
+                    "Anggota 2: Rifa'i",
+                    "Anggota 3: Norbayati",
+                    "Anggota 4: Siti Khadijah",
+                    "Anggota 5: Fitri",
+                    "Anggota 6: Nurul aida",
+                    "Anggota 7: Nafis"
+                ]
+            },
+            pembinaan_karakter: {
+                title: "Departemen Pembinaan Karakter",
+                members: [
+                    "Ketua: Nor aina Azzahra",
+                    "Anggota 1: Hafis",
+                    "Anggota 2: Sarni",
+                    "Anggota 3: Auliya",
+                    "Anggota 4: Hilmah",
+                    "Anggota 5: Madina",
+                    "Anggota 6: Mahfuzatul aulia"
+                ]
+            },
+            olahraga_seni: {
+                title: "Departemen Olahraga dan Seni",
+                members: [
+                    "Ketua: Fahrul",
+                    "Anggota 1: Dayat",
+                    "Anggota 2: Erlina",
+                    "Anggota 3: Assyifa",
+                    "Anggota 4: Anisa fitri",
+                    "Anggota 5: Nor Aisya",
+                    "Anggota 6: Munawarah MP.B"
+                ]
+            },
+            humas_sosial: {
+                title: "Departemen Humas Sosial Masyarakat dan Komunikasi",
+                members: [
+                    "Ketua: Muhammad wafa",
+                    "Anggota 1: Rudi",
+                    "Anggota 2: Arbayu",
+                    "Anggota 3: Nazwa ameliya",
+                    "Anggota 4: Norhidayati",
+                    "Anggota 5: Raida",
+                    "Anggota 6: Nurin Shahifah",
+                    "Anggota 7: Saidah"
+                ]
+            },
+            sosial_kemasyarakatan: {
+                title: "Departemen Kegiatan Sosial dan Kemasyarakatan",
+                 members: [
+                    "Ketua: Akhmad risky",
+                    "Anggota 1: Sauki",
+                    "Anggota 2: Netty Agustina",
+                    "Anggota 3: Abd.Kholiq",
+                    "Anggota 4: Rabiatul",
+                    "Anggota 5: Munawarah MP.A",
+                    "Anggota 6: Saidatul Kharimah"
+                ]
+            },
+             lingkungan: {
+                title: "Departemen Lingkungan Hidup (Tambahan)",
+                members: [
+                    "Departemen ini ditambahkan untuk memenuhi permintaan.",
+                    "Silakan isi nama-nama anggota di sini setelah ditetapkan."
+                ]
+            }
+        };
+
+        // Function to open tab content
+        function openTab(tabName, element) {
+            const tabcontent = document.getElementsByClassName("content-section");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+
+            const tablinks = document.getElementsByClassName("nav-button");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+
+            document.getElementById(tabName).classList.add("active");
+            element.classList.add("active");
+        }
+
+        // Function to open the member list modal
+        function openModal(departmentKey) {
+            const modal = document.getElementById("memberModal");
+            const modalTitle = document.getElementById("modalTitle");
+            const modalMemberList = document.getElementById("modalMemberList");
+            
+            const deptData = osisData[departmentKey];
+            if (!deptData) return;
+
+            modalTitle.textContent = deptData.title;
+            modalMemberList.innerHTML = ''; 
+
+            deptData.members.forEach(member => {
+                const li = document.createElement('li');
+                li.innerHTML = member; 
+                modalMemberList.appendChild(li);
+            });
+
+            modal.style.display = "block";
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            document.getElementById("memberModal").style.display = "none";
+        }
+
+        // Close the modal when the user clicks anywhere outside of the modal
+        window.onclick = function(event) {
+            const modal = document.getElementById("memberModal");
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+        
+        // Ensure the default tab is open on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const defaultButton = document.querySelector('.nav-button.active');
+            if (defaultButton) {
+                // Manually trigger the tab opening for the default tab
+                openTab('pengetahuan', defaultButton);
+            }
+        });
+    </script>
+
+</body>
+</html>
